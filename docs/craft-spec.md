@@ -1,53 +1,47 @@
-# Dragon Scale Binding Craft Spec
+# 龙鳞装工艺规格
 
-Status: planning baseline
+状态：规划基线
 
-## Purpose
+## 目的
 
-This document defines the craft model and geometry rules for the first version
-of Dragon Scale Studio. It is the source of truth for editor layout, preview,
-export, tests, and README assembly instructions.
+本文定义鳞卷工坊第一版使用的龙鳞装/旋风装工艺模型和几何规则。编辑器、预览、导出、测试和组装说明都必须引用同一套规则。
 
-## Canonical Units
+## 标准单位
 
-Use centimeters as the canonical project unit.
+项目内部以厘米作为标准设计单位。
 
-Convert to pixels only at render/export boundaries:
+只在渲染和导出边界转换为像素：
 
 ```text
 px = round(cm / 2.54 * dpi)
 cm = px / dpi * 2.54
 ```
 
-Default export DPI:
+默认导出精度：
 
 ```text
 dpi = 300
 ```
 
-All formulas should be implemented as pure functions under the future `binding`
-module.
+所有公式应实现为 `binding` 模块中的纯函数。
 
-## Binding Model
+## 结构模型
 
-Dragon scale binding has these structural parts:
+龙鳞装包含以下结构：
 
-- Scroll base: the long paper or backing surface.
-- Front scroll image: the artwork visible when the scroll is open.
-- Back scroll image: the artwork formed or referenced when the scroll is rolled
-  or viewed from the exposed slice side.
-- Leaf: one pasted page.
-- Paste area: the part of a leaf attached to the scroll base.
-- Visible area: the part of a leaf carrying the artwork shown when opened.
-- Exposed slice: the repeated offset edge that creates the scale structure.
+- 底卷：承载整件作品的长纸或底衬。
+- 正面长卷：完全展开时看到的长卷画面。
+- 背面长卷：收卷或查看鳞片边缘时参考的背面画面。
+- 叶片：粘贴在底卷上的单页。
+- 粘贴区：叶片固定在底卷上的区域。
+- 可视区：叶片展开后承载图像或文字的区域。
+- 鳞片露出区：连续错位后形成“龙鳞”效果的边缘。
 
-The MVP uses a horizontal binding model. Vertical orientation can be added after
-the horizontal export path is verified.
+MVP 先实现横向龙鳞装。纵向装帧在横向导出稳定后再扩展。
 
-## Default Preset
+## 默认预设
 
-The first preset should match the public Dayu reference closely enough that users
-understand the model:
+第一版默认预设：
 
 ```text
 artworkHeightCm = 30
@@ -60,69 +54,67 @@ orientation = horizontal
 dpi = 300
 ```
 
-The app may later add smaller preview/demo presets, but the default craft preset
-must remain physically meaningful.
+中文含义：
 
-## Required Terms
+- 画心高度：30cm
+- 页面可视宽度：22cm
+- 粘贴宽度：2cm
+- 鳞片露出宽度：2cm
+- 叶片数量：23
+- 边缘样式：直边
+- 方向：横向
+- 导出 DPI：300
 
-### artworkHeightCm
+## 核心术语
 
-Height of the printed artwork area.
+### 画心高度
 
-### visiblePageWidthCm
+打印作品的有效高度，字段为 `artworkHeightCm`。
 
-Width of the visible part of one leaf, excluding the paste area.
+### 页面可视宽度
 
-### pasteWidthCm
+单个叶片展开后可见部分的宽度，不包含粘贴区，字段为 `visiblePageWidthCm`。
 
-Width of the area glued or mounted to the scroll base.
+### 粘贴宽度
 
-### sliceWidthCm
+叶片固定到底卷上的宽度，字段为 `pasteWidthCm`。
 
-Horizontal offset between consecutive leaves. This is also the exposed scale
-width in the default craft model.
+### 鳞片露出宽度
 
-For MVP, `pasteWidthCm` and `sliceWidthCm` can default to the same value but must
-remain separate fields in the data model.
+相邻叶片之间的水平错位距离，也是默认模型中的鳞片露出宽度，字段为 `sliceWidthCm`。
 
-### leafPhysicalWidthCm
+MVP 中粘贴宽度和鳞片露出宽度默认同为 2cm，但数据模型必须分开保存。
 
-Total physical width of one leaf:
+### 叶片物理宽度
 
 ```text
 leafPhysicalWidthCm = pasteWidthCm + visiblePageWidthCm
 ```
 
-### scrollArtworkLengthCm
-
-Length needed for the visible scale sequence:
+### 长卷画心长度
 
 ```text
 scrollArtworkLengthCm = visiblePageWidthCm + leafCount * sliceWidthCm
 ```
 
-This does not include optional scroll margins or mounting tails.
+该值不包含额外首尾留边或装裱尾纸。
 
-### pageStructureCount
-
-Default page structure count:
+### 页面结构数
 
 ```text
 pageStructureCount = leafCount + 1
 ```
 
-This accounts for the base/open structure plus the leaf sequence. Export naming
-must define exactly which assets are generated for leaves, scroll artwork, and
-assembly maps.
+该值用于描述底卷结构加叶片序列，不等同于最终导出的文件数量。导出规格必须单独说明每类文件。
 
-## Leaf Placement
+## 叶片排布
 
-Leaves are placed left to right with a constant offset:
+叶片从左到右按固定错位排布：
 
 ```text
 leaf[i].xCm = i * sliceWidthCm
 leaf[i].yCm = 0
-leaf[i].widthCm = leafPhysicalWidthCm
+leaf[i].widthCm = pasteWidthCm + visiblePageWidthCm
 leaf[i].heightCm = artworkHeightCm
 leaf[i].pasteRect = {
   xCm: 0,
@@ -138,14 +130,11 @@ leaf[i].visibleRect = {
 }
 ```
 
-The editor should display paste and visible regions distinctly. Export may
-include optional construction guides, but final artwork exports should be clean
-unless the user selects guide overlays.
+编辑器必须明确显示粘贴区和可视区。最终干净导出不应包含施工线，除非用户选择导出辅助版。
 
-## Scroll Margins
+## 留边
 
-The MVP should support optional margins, even if the first UI hides them behind
-advanced settings:
+MVP 可先隐藏留边设置，但模型应预留字段：
 
 ```text
 marginStartCm = 0
@@ -154,7 +143,7 @@ marginTopCm = 0
 marginBottomCm = 0
 ```
 
-Derived base size:
+底卷总尺寸：
 
 ```text
 scrollBaseLengthCm =
@@ -164,59 +153,56 @@ scrollBaseHeightCm =
   marginTopCm + artworkHeightCm + marginBottomCm
 ```
 
-## Source Image Roles
+## 图片角色
 
-### Front Scroll Image
+### 正面长卷
 
-Fills the front scroll artwork area:
+映射到长卷画心区域：
 
 ```text
 widthCm = scrollArtworkLengthCm
 heightCm = artworkHeightCm
 ```
 
-### Back Scroll Image
+### 背面长卷
 
-Fills the same physical artwork area as the front scroll image. It may be used
-as a continuous image or as a source for exposed slice checks.
+使用同样的物理画心区域，可用于卷动预览或鳞片边缘检查。
 
-### Inner Page Images
+### 内页叶片
 
-Each inner page image maps into one leaf visible area:
+每张内页图映射到一个叶片可视区：
 
 ```text
 widthCm = visiblePageWidthCm
 heightCm = artworkHeightCm
 ```
 
-The paste area may remain blank, use edge continuation, or carry construction
-marks depending on export mode.
+粘贴区可留白、延展边缘或显示施工标记，取决于导出模式。
 
-## Edge Styles
+## 边缘样式
 
-MVP edge styles:
+MVP 支持：
 
-- `straight`: rectangular leaf.
-- `wave`: subtle wave edge for decorative or aged-paper effect.
-- `sawtooth`: stylized tooth edge.
+- `straight`：直边。
+- `wave`：波浪边。
+- `sawtooth`：锯齿边。
 
-Edge style must not change the underlying placement formula. It only changes the
-mask used for display/export.
+边缘样式只影响显示/导出遮罩，不改变几何排布公式。
 
-## Image Fit Modes
+## 图片适配
 
-MVP should support:
+MVP 支持：
 
-- `cover`: fills the target region and crops overflow.
-- `contain`: fits the whole image with empty space.
+- `cover`：填满目标区域，超出部分裁切。
+- `contain`：完整显示图片，可能留空。
 
-Default:
+默认：
 
 ```text
 fitMode = cover
 ```
 
-Transforms are non-destructive:
+变换参数非破坏性保存：
 
 ```text
 transform = {
@@ -228,50 +214,50 @@ transform = {
 }
 ```
 
-## Validation Rules
+## 校验规则
 
-Hard errors:
+硬错误：
 
-- `artworkHeightCm <= 0`.
-- `visiblePageWidthCm <= 0`.
-- `pasteWidthCm <= 0`.
-- `sliceWidthCm <= 0`.
-- `leafCount < 1`.
-- Missing required image for an export mode.
-- Unsupported project schema version without migration.
+- 画心高度小于或等于 0。
+- 页面可视宽度小于或等于 0。
+- 粘贴宽度小于或等于 0。
+- 鳞片露出宽度小于或等于 0。
+- 叶片数量小于 1。
+- 导出 DPI 小于或等于 0。
+- 导出所需图片缺失。
+- 项目 schema 版本不支持且无法迁移。
 
-Warnings:
+警告：
 
-- Source image resolution below target export pixels.
-- PDF physical page larger than common printer capability.
-- `sliceWidthCm > pasteWidthCm`.
-- `pasteWidthCm` too narrow for hand assembly.
-- Leaf count and uploaded inner page count differ.
-- Long scroll length likely exceeds home printer paper sizes.
+- 源图分辨率低于导出目标。
+- PDF 物理页面超出常见打印能力。
+- 鳞片露出宽度大于粘贴宽度。
+- 粘贴宽度过窄，不利于手工组装。
+- 上传内页数量与叶片数量不一致。
+- 长卷长度可能不适合家用打印机。
 
-## Resolution Guidance
+## 分辨率参考
 
-For a region:
+目标区域像素：
 
 ```text
 targetWidthPx = round(widthCm / 2.54 * dpi)
 targetHeightPx = round(heightCm / 2.54 * dpi)
 ```
 
-At 300 DPI, a 30 cm high region needs about:
+30cm 高、300DPI 时：
 
 ```text
 round(30 / 2.54 * 300) = 3543 px
 ```
 
-The editor may preview at lower resolution, but export checks must use the
-actual target pixels.
+编辑器可以低分辨率预览，但导出检查必须按真实目标像素计算。
 
-## Test Cases
+## 测试用例
 
-### Default Preset
+### 默认预设
 
-Input:
+输入：
 
 ```text
 artworkHeightCm = 30
@@ -281,7 +267,7 @@ sliceWidthCm = 2
 leafCount = 23
 ```
 
-Expected:
+期望：
 
 ```text
 leafPhysicalWidthCm = 24
@@ -289,9 +275,9 @@ scrollArtworkLengthCm = 68
 pageStructureCount = 24
 ```
 
-### Wider Slice
+### 更宽鳞片
 
-Input:
+输入：
 
 ```text
 visiblePageWidthCm = 22
@@ -300,33 +286,26 @@ sliceWidthCm = 2.5
 leafCount = 10
 ```
 
-Expected:
+期望：
 
 ```text
 leafPhysicalWidthCm = 24.5
 scrollArtworkLengthCm = 47
 ```
 
-### Invalid Slice
+### 非法鳞片宽度
 
-Input:
+输入：
 
 ```text
 sliceWidthCm = 0
 ```
 
-Expected:
+期望：硬错误。
 
-```text
-hard error
-```
+## 待决策
 
-## Open Decisions
-
-- Whether P0 export should include physical scroll base artwork split across
-  printable sheets or only as long images.
-- Whether `sliceWidthCm > pasteWidthCm` should remain a warning or become an
-  advanced-mode error.
-- Whether vertical orientation belongs in MVP or Phase 3.
-- Whether front/back scroll images should be required for all exports or only
-  for full assembly exports.
+- P0 是否导出长卷底纸分片，还是只导出完整长图。
+- `sliceWidthCm > pasteWidthCm` 是保持警告，还是高级模式外直接报错。
+- 纵向装帧是否进入 MVP。
+- 正/背长卷是否所有导出都必需，还是只在完整组装导出中必需。

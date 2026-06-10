@@ -1,32 +1,31 @@
-# Dragon Scale Studio Export Spec
+# 鳞卷工坊导出规格
 
-Status: planning baseline
+状态：规划基线
 
-## Purpose
+## 目的
 
-This document defines export formats for the first production path. It should be
-used by implementation, testing, and README generation.
+本文定义鳞卷工坊 MVP 的导出格式。实现、测试和导出 README 都必须遵守该契约。
 
-## Export Types
+## 导出类型
 
-MVP export types:
+MVP 导出类型：
 
-1. Editable project package.
-2. Print-ready image package.
-3. PDF package.
-4. README assembly instructions.
+1. 可编辑项目包。
+2. 打印图片包。
+3. PDF 包。
+4. 中文 README 组装说明。
 
-Recording and watermark exports are later features.
+录制和水印导出属于后续阶段。
 
-## Editable Project Package
+## 可编辑项目包
 
-Default extension:
+默认扩展名：
 
 ```text
 .dscale.zip
 ```
 
-The project package is a ZIP archive:
+项目包是 ZIP：
 
 ```text
 project.dscale.zip
@@ -40,17 +39,17 @@ project.dscale.zip
     thumbnail.jpg
 ```
 
-The package must be importable without network access.
+项目包必须能离线导入。
 
 ### project.json
 
-Required fields:
+必需字段：
 
 ```json
 {
   "schemaVersion": 1,
-  "app": "dragon-scale-studio",
-  "title": "Untitled Project",
+  "app": "linjuan-workshop",
+  "title": "未命名项目",
   "createdAt": "ISO-8601",
   "updatedAt": "ISO-8601",
   "settings": {
@@ -71,7 +70,7 @@ Required fields:
 }
 ```
 
-Asset record shape:
+素材记录：
 
 ```json
 {
@@ -86,7 +85,7 @@ Asset record shape:
 }
 ```
 
-Transform shape:
+变换记录：
 
 ```json
 {
@@ -99,27 +98,27 @@ Transform shape:
 }
 ```
 
-### Password Protection
+### 密码保护
 
-Password protection is not part of MVP.
+密码保护不属于 MVP。
 
-If added later, it must:
+如后续加入，必须：
 
-- Use a user-provided passphrase.
-- Derive keys with a standard password-based key derivation function.
-- Store salt and encryption metadata in the archive.
-- Avoid hard-coded shared keys.
-- Avoid copy-proof claims.
+- 使用用户提供的口令。
+- 使用标准口令派生算法。
+- 在包内保存 salt 和加密元数据。
+- 不使用硬编码共享密钥。
+- 不宣传“绝对防拷贝”。
 
-## Print-Ready Image Package
+## 打印图片包
 
-Default archive:
+默认文件：
 
 ```text
-<project-title>-images.zip
+<项目名>-图片包.zip
 ```
 
-Suggested structure:
+建议结构：
 
 ```text
 images.zip
@@ -137,17 +136,15 @@ images.zip
     calibration_10cm.png
 ```
 
-### Naming Rules
+### 命名规则
 
-- Frame names must be zero-padded and stable.
-- Leaf frame numbering starts at `frame_001`.
-- Frame order follows physical assembly order from left to right.
-- The package must include `manifest.json`.
-- `README.txt` must repeat every physical parameter needed for assembly.
+- frame 文件名必须补零且稳定。
+- 叶片编号从 `frame_001` 开始。
+- 文件顺序等于从左到右的物理组装顺序。
+- 图片包必须包含 `manifest.json`。
+- `README.txt` 必须列出组装所需的全部物理参数。
 
-### Frame Image Dimensions
-
-For each leaf frame:
+### 叶片图片尺寸
 
 ```text
 frameWidthCm = pasteWidthCm + visiblePageWidthCm
@@ -156,7 +153,7 @@ frameWidthPx = round(frameWidthCm / 2.54 * dpi)
 frameHeightPx = round(frameHeightCm / 2.54 * dpi)
 ```
 
-For full scroll images:
+### 长卷图片尺寸
 
 ```text
 scrollWidthCm = scrollArtworkLengthCm
@@ -165,32 +162,32 @@ scrollWidthPx = round(scrollWidthCm / 2.54 * dpi)
 scrollHeightPx = round(scrollHeightCm / 2.54 * dpi)
 ```
 
-### Guide Overlays
+### 辅助线
 
-Guide overlays are optional and must be explicit.
+辅助线必须显式选择。
 
-Clean export:
+干净导出：
 
-- No page numbers on artwork.
-- No construction lines.
-- No watermarks.
+- 不加页码。
+- 不加施工线。
+- 不加水印。
 
-Guide export:
+辅助导出：
 
-- Paste area boundary.
-- Page number.
-- Cut line.
-- Optional 10 cm calibration marker.
+- 粘贴区边界。
+- 页码。
+- 裁切线。
+- 10cm 校准标尺。
 
-## PDF Export
+## PDF 导出
 
-Default archive:
+默认文件：
 
 ```text
-<project-title>-pdf.zip
+<项目名>-PDF包.zip
 ```
 
-Suggested structure:
+建议结构：
 
 ```text
 pdf.zip
@@ -200,10 +197,9 @@ pdf.zip
   calibration.pdf
 ```
 
-### PDF Page Units
+### PDF 单位
 
-PDF pages must use physical dimensions matching the project settings. If the PDF
-library uses points, convert through centimeters:
+如果 PDF 库使用 point，按厘米转换：
 
 ```text
 points = cm / 2.54 * 72
@@ -211,14 +207,14 @@ points = cm / 2.54 * 72
 
 ### print_pages.pdf
 
-One page per leaf frame:
+每个叶片一页：
 
 ```text
 pageWidthCm = pasteWidthCm + visiblePageWidthCm
 pageHeightCm = artworkHeightCm
 ```
 
-Orientation is derived:
+方向：
 
 ```text
 orientation = pageWidthCm >= pageHeightCm ? landscape : portrait
@@ -226,71 +222,69 @@ orientation = pageWidthCm >= pageHeightCm ? landscape : portrait
 
 ### scroll_artwork.pdf
 
-Contains front and back scroll artwork. For home printing, very long scrolls may
-need tiling. Tiling can be a Phase 2.5 feature if full-length PDF pages are not
-practical in common PDF viewers.
+包含正面长卷和背面长卷。长卷过长时可能需要分片打印；分片导出可作为 Phase 2.5 功能。
 
 ### calibration.pdf
 
-Must include:
+必须包含：
 
-- 10 cm horizontal ruler.
-- 10 cm vertical ruler.
-- Paste width sample.
-- Slice width sample.
-- DPI and generation date.
+- 10cm 横向标尺。
+- 10cm 纵向标尺。
+- 粘贴宽度样条。
+- 鳞片露出宽度样条。
+- DPI 和导出日期。
 
-## README Assembly Instructions
+## README 组装说明
 
-Every print export must include `README.txt`.
+所有打印导出都必须包含 `README.txt`。
 
-Required sections:
+必需章节：
 
 ```text
-Project
-Parameters
-Generated Files
-Print Settings
-Assembly Order
-Warnings
-Support Links
+项目
+参数
+生成文件
+打印设置
+组装顺序
+警告
+支持链接
 ```
 
-Required parameter list:
+必需参数：
 
-- Project title.
-- Export date.
-- Artwork height.
-- Visible page width.
-- Paste width.
-- Slice width.
-- Leaf count.
-- Page structure count.
-- Edge style.
-- DPI.
-- Frame size.
-- Scroll artwork size.
+- 项目名。
+- 导出日期。
+- 画心高度。
+- 页面可视宽度。
+- 粘贴宽度。
+- 鳞片露出宽度。
+- 叶片数量。
+- 页面结构数。
+- 边缘样式。
+- DPI。
+- 叶片文件尺寸。
+- 长卷画心尺寸。
 
-Assembly order must state:
+组装顺序必须说明：
 
-1. Print frames in file-name order.
-2. Keep print scaling at 100 percent.
-3. Verify the 10 cm calibration page.
-4. Prepare the scroll base.
-5. Place `frame_001` first.
-6. Offset each next frame by `sliceWidthCm`.
-7. Paste only inside the paste area.
-8. Check exposed edges before final pressing.
+1. 按文件名顺序打印 frame 文件。
+2. 打印缩放保持 100%。
+3. 先校验 10cm 标尺。
+4. 准备底卷。
+5. 先贴 `frame_001`。
+6. 每张后续叶片按鳞片露出宽度错位。
+7. 只在粘贴区上胶或固定。
+8. 最终压平前检查露出边缘。
 
 ## manifest.json
 
-The export manifest records generated files and dimensions:
+导出 manifest 记录文件与尺寸：
 
 ```json
 {
   "schemaVersion": 1,
   "exportType": "images",
-  "projectTitle": "Untitled Project",
+  "projectTitle": "未命名项目",
   "exportedAt": "ISO-8601",
   "settings": {},
   "derived": {
@@ -312,63 +306,60 @@ The export manifest records generated files and dimensions:
 }
 ```
 
-## Export Validation
+## 导出校验
 
-Hard errors:
+硬错误：
 
-- Missing required images for the selected export.
-- Invalid geometry.
-- Canvas allocation failure.
-- PDF generation failure.
-- Project schema cannot serialize.
+- 当前导出所需图片缺失。
+- 几何参数非法。
+- canvas 分配失败。
+- PDF 生成失败。
+- 项目 schema 无法序列化。
 
-Warnings:
+警告：
 
-- Source image lower than export target.
-- Export output may exceed browser memory.
-- Scroll artwork too long for normal home printing.
-- Uploaded inner page count does not match leaf count.
-- Guide overlays enabled.
+- 源图分辨率低于目标导出像素。
+- 导出可能超过浏览器内存。
+- 长卷尺寸不适合家用打印机。
+- 上传内页数量与叶片数量不一致。
+- 辅助线已开启。
 
-## Performance Requirements
+## 性能要求
 
-- Generate pages sequentially.
-- Show progress.
-- Allow cancellation.
-- Release each temporary canvas after use by clearing width and height.
-- Avoid storing duplicate base64 copies in memory when blobs are available.
-- Prefer blob/object URLs for preview.
+- 逐页生成。
+- 显示进度。
+- 允许取消。
+- 每页生成后清空临时 canvas 的宽高。
+- 有 Blob 时避免重复保存 base64。
+- 预览优先使用 Blob URL。
 
-## Test Plan
+## 测试计划
 
-### Unit Tests
+### 单元测试
 
-- Centimeter-to-pixel conversion.
-- Derived dimensions.
-- Frame naming.
-- Manifest generation.
-- Export validation errors and warnings.
+- 厘米到像素转换。
+- 派生尺寸。
+- frame 命名。
+- manifest 生成。
+- 导出校验错误和警告。
 
-### Integration Tests
+### 集成测试
 
-- Create project, export package, import package, compare settings/assets/order.
-- Generate image export with a small fixture set.
-- Generate PDF and inspect page count and physical page sizes.
+- 创建项目、导出项目包、导入项目包、比较设置/素材/顺序。
+- 用小型 fixture 生成图片包。
+- 生成 PDF 并检查页数和物理尺寸。
 
-### Browser Tests
+### 浏览器测试
 
-- Upload front/back/leaf images.
-- Reorder leaves.
-- Export project package.
-- Export image package.
-- Verify mobile editor layout at `390x844`.
+- 上传正面/背面/内页。
+- 内页排序。
+- 导出项目包。
+- 导出图片包。
+- `390x844` 移动宽度布局检查。
 
-## Open Decisions
+## 待决策
 
-- Whether clean and guide exports should be separate files or a toggle inside one
-  archive.
-- Whether `scroll_artwork.pdf` should use long physical pages, tiled pages, or
-  both.
-- Whether image export default should be PNG, JPEG, or user-selectable.
-- Whether thumbnail generation belongs in project package export or local draft
-  save only.
+- 干净导出和辅助导出是两个包，还是同一包内两个目录。
+- `scroll_artwork.pdf` 使用长页、分片页，还是二者都支持。
+- 图片导出默认 PNG、JPEG，还是用户可选。
+- 缩略图在项目导出时生成，还是只用于本地草稿。

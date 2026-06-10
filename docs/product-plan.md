@@ -1,314 +1,267 @@
-# Dragon Scale Studio Product Plan
-
-Status: planning baseline
-
-## Summary
-
-Dragon Scale Studio is a local-first web application for creating dragon scale
-binding artworks. Users upload a front scroll image, a back scroll image, and a
-sequence of inner page images. The app calculates the binding structure,
-provides an editable visual layout, previews the page/scroll effect, and exports
-printable files plus an editable project package.
+# 鳞卷工坊产品计划
 
-The first product milestone is not a commercial platform. It is a reliable
-creation tool that proves the craft geometry, printable export path, and project
-round trip.
+状态：规划基线
 
-## Goals
+## 概述
 
-- Make dragon scale binding layout approachable for artists, designers, craft
-  educators, and hobbyists.
-- Replace manual offset calculation with deterministic layout rules.
-- Preserve the craft model: scroll base, leaves, paste area, visible area, and
-  exposed slices.
-- Export assets that can be printed and assembled.
-- Keep the first version usable without login, network storage, payment, or
-  backend services.
+鳞卷工坊是一个本地优先的龙鳞装/旋风装艺术创作工具。用户上传正面长卷、背面长卷和内页图像后，系统计算龙鳞装结构，提供可编辑的二维画布，后续扩展翻页/卷动预览，并导出可打印素材与可继续编辑的项目包。
 
-## Non-Goals
+第一阶段不是商业平台，而是一个可靠的创作工具：先证明工艺几何、中文编辑体验、项目往返和打印导出路径。
 
-The MVP will not include:
-
-- User accounts.
-- Payment, membership, or subscriptions.
-- Cloud project sync.
-- Order management or print fulfillment.
-- Public community publishing.
-- Template marketplace.
-- DRM or hard-to-extract project protection claims.
-- AI image generation as a required workflow.
+## 产品目标
 
-These can be explored after the local workflow is useful and verified.
+- 降低龙鳞装排版和错位计算门槛。
+- 用确定性几何规则替代手工估算。
+- 保留传统工艺中的底卷、叶片、粘贴区、可视区和鳞片露出关系。
+- 输出能打印、能组装、能复开的素材。
+- 第一版不依赖登录、云端、支付或后端服务。
 
-## Reference Findings
+## 非目标
 
-Public Dayu documentation confirms the feasibility of this product shape:
-
-- A browser-based editor can upload a front scroll image, a back scroll image,
-  and inner page illustrations.
-- Default craft parameters can be expressed in physical units such as canvas
-  height, page width, and slice width.
-- Exports can include project files, frame images, PDF files, and assembly
-  instructions.
-- Recording and watermarking are useful but should follow the editing/export
-  foundation.
+MVP 不包含：
 
-The Dayu application bundle also shows a feasible browser stack: React,
-Zustand, IndexedDB, ZIP packaging, PDF generation, image cropping, and Three.js
-preview. This project should use those as feasibility signals, not as source
-code to copy.
+- 用户账号。
+- 会员、订阅或支付。
+- 云端同步。
+- 订单管理或打印履约。
+- 社区发布。
+- 模板市场。
+- 强 DRM 或“不可提取素材”的承诺。
+- 必需的 AI 生图流程。
 
-## Primary Users
+这些能力必须在本地创作链路稳定之后再评估。
 
-### Craft Creator
+## Dayu 参考结论
 
-Creates physical dragon scale binding artworks. Needs accurate print dimensions,
-assembly order, and clear warnings when source images are too small.
+公开 Dayu 文档证明了该产品形态可行：
 
-### Visual Designer
+- 浏览器端可以上传正面长卷、背面长卷和内页插图。
+- 工艺参数可以用画布高度、页面宽度、切片宽度等物理单位描述。
+- 导出可以覆盖工程文件、图片包、PDF 和组装说明。
+- 录制和水印有价值，但应排在编辑与导出基础之后。
 
-Creates digital showcases and client previews. Needs strong crop controls,
-quick previews, and exportable images/video.
+本项目参考 Dayu 的功能链路，不复制其源代码、品牌、视觉、付费流程或加密说法。
 
-### Educator or Exhibition Producer
+## 目标用户
 
-Uses the app to explain how dragon scale binding works. Needs readable visual
-structure, presets, and predictable demonstration files.
+### 手作创作者
 
-## Product Principles
+需要准确的打印尺寸、粘贴顺序和组装说明，重点关注实体作品能否做出来。
 
-1. Physical correctness before visual flourish.
-2. Local-first by default.
-3. Every layout value should be explainable in centimeters.
-4. The export contract is part of the product, not an afterthought.
-5. Advanced features should not make basic craft setup harder.
+### 视觉设计师
 
-## MVP User Flow
+需要快速调整图片裁剪、排序和作品预览，重点关注展示效果和客户沟通。
 
-1. User opens the app and creates a new project.
-2. User selects or accepts a size preset.
-3. User uploads:
-   - front scroll image,
-   - back scroll image,
-   - inner page images.
-4. User reorders inner pages if needed.
-5. User adjusts crop, scale, rotation, and position.
-6. User reviews a 2D WYSIWYG layout.
-7. User runs export checks.
-8. User exports:
-   - editable project package,
-   - high-resolution image package,
-   - PDF,
-   - README assembly instructions.
-9. User reopens the project package and verifies the layout is preserved.
+### 教育/展陈人员
 
-## MVP Functional Requirements
+需要用可视化方式解释龙鳞装结构，重点关注清晰的结构示意、参数说明和演示项目。
 
-### Project Setup
+## 产品原则
 
-- Create a project from default preset.
-- Edit title, canvas height, visible page width, paste width, slice width, leaf
-  count, edge style, and export DPI.
-- Show derived dimensions immediately.
-- Warn when values are outside safe bounds.
+1. 工艺准确优先于视觉花样。
+2. 本地优先，不用账号也能完成核心创作。
+3. 所有排版值都要能用厘米解释。
+4. 导出契约是产品能力的一部分。
+5. 后续高级功能不能牺牲基础编辑流程。
 
-### Asset Management
+## MVP 用户流程
 
-- Upload front scroll image.
-- Upload back scroll image.
-- Batch upload inner page images.
-- Reorder inner pages.
-- Replace and remove any image.
-- Store source images locally in IndexedDB.
-- Keep stable asset IDs so transforms survive reordering.
+1. 打开应用并新建项目。
+2. 选择或接受默认龙鳞装预设。
+3. 上传正面长卷、背面长卷和内页图像。
+4. 对内页图像排序、替换、删除。
+5. 调整裁剪、缩放、旋转和定位。
+6. 在二维画布检查叶片错落和粘贴区。
+7. 运行导出前检查。
+8. 导出项目包、高清图片包、PDF 和组装 README。
+9. 重新导入项目包，确认参数、素材和变换完整恢复。
 
-### Image Adjustment
+## MVP 功能需求
 
-- Support crop, scale, rotate, and drag.
-- Store non-destructive transforms.
-- Provide a reset action per image.
-- Show the paste area separately from visible content.
+### 项目设置
 
-### 2D Editor
+- 从默认预设创建项目。
+- 编辑项目名、画心高度、页面可视宽度、粘贴宽度、鳞片露出宽度、叶片数量、边缘样式和导出 DPI。
+- 即时显示派生尺寸。
+- 参数越界时显示中文错误或警告。
 
-- Render the scroll base and leaves using calculated geometry.
-- Show page boundaries, paste area, visible area, and exposed slice offsets.
-- Support zoom and pan.
-- Keep edit controls usable on desktop and mobile.
+### 素材管理
 
-### Export
+- 上传正面长卷。
+- 上传背面长卷。
+- 批量上传内页叶片。
+- 支持内页排序、替换和删除。
+- 图片源文件本地保存到 IndexedDB。
+- 素材使用稳定 ID，排序后裁剪参数不丢失。
 
-- Export a project package that can be imported later.
-- Export print-ready images.
-- Export PDF.
-- Export README instructions.
-- Show export progress and cancellation.
-- Release large temporary canvases after each generated page.
+### 图片调整
 
-## Later Features
+- 支持裁剪、缩放、旋转和拖拽定位。
+- 变换参数非破坏性保存。
+- 每张图提供重置操作。
+- 粘贴区和可视区在画布上明确区分。
 
-### Preview
+### 二维编辑器
 
-- Interactive page flip preview.
-- Scroll/roll preview.
-- Optional 3D preview with react-three-fiber.
+- 用几何计算结果渲染底卷与叶片。
+- 显示叶片边界、粘贴区、可视区和鳞片错位。
+- 支持缩放和平移。
+- 桌面端采用三栏编辑器，移动端采用分区堆叠或标签式布局。
 
-### Recording
+### 导出
 
-- Clean canvas recording.
-- Direct window recording.
-- Watermark text and position settings.
+- 导出可重新导入的项目包。
+- 导出打印图片包。
+- 导出 PDF。
+- 导出中文组装 README。
+- 显示导出进度和取消状态。
+- 导出每页后释放临时画布，控制浏览器内存。
 
-### Templates
+## 后续能力
 
-- Classical scroll preset.
-- Illustration book preset.
-- Photography sequence preset.
-- Education/demo preset.
+### 预览
 
-### Commercial Layer
+- 交互式翻页预览。
+- 卷动/收卷预览。
+- Three.js 3D 预览。
 
-- Cloud projects.
-- Customer review links.
-- Paid high-resolution export.
-- Print and assembly service order flow.
+### 录制
 
-## Technical Baseline
+- 纯净画布录制。
+- 当前窗口录制。
+- 自定义水印。
 
-- Vite, React, TypeScript.
-- Zustand for state.
-- Dexie/IndexedDB for local projects and blobs.
-- Canvas 2D for editor and print render path.
-- JSZip or fflate for project/export packages.
-- jsPDF or pdf-lib for PDF.
-- Vitest for geometry/export tests.
-- Playwright for browser checks.
+### 模板
 
-## Implementation Phases
+- 古籍长卷模板。
+- 插画集模板。
+- 摄影序列模板。
+- 教学演示模板。
 
-### Phase 0: Planning and Craft Baseline
+### 商业层
 
-Deliverables:
+- 云端项目。
+- 客户审阅链接。
+- 付费高清导出。
+- 打印与组装服务订单。
 
-- Project guide.
-- Product plan.
-- Craft spec.
-- Export spec.
-- Basic test image set.
+## 技术基线
 
-Exit criteria:
+- Vite、React、TypeScript。
+- Zustand 管理编辑状态。
+- Dexie/IndexedDB 存储本地项目和图片 Blob。
+- Canvas 2D 作为编辑与打印渲染基础。
+- JSZip 或 fflate 打包项目与导出文件。
+- jsPDF 或 pdf-lib 生成 PDF。
+- Vitest 测试几何和导出逻辑。
+- Playwright 或浏览器工具做界面验证。
 
-- Terms and formulas are stable enough to implement.
-- Export package contents are defined.
-- Known non-goals are documented.
+## 阶段路线
 
-### Phase 1: Local Editor Foundation
+### 阶段 0：规划与工艺基线
 
-Deliverables:
+交付物：
 
-- Vite/React/TypeScript app.
-- Project state model.
-- Asset upload and IndexedDB storage.
-- 2D layout renderer.
-- Basic crop/scale/drag transforms.
+- 项目规则。
+- 产品计划。
+- Dayu 功能对照。
+- 工艺规格。
+- 导出规格。
+- 默认几何测试。
 
-Exit criteria:
+退出标准：
 
-- User can create a project, upload assets, arrange pages, refresh, and recover
-  the draft locally.
+- 中文术语稳定。
+- 默认公式可测试。
+- 导出包结构明确。
+- 不做的范围写清楚。
 
-### Phase 2: Printable Export
+### 阶段 1：本地编辑器基础
 
-Deliverables:
+交付物：
 
-- Project package import/export.
-- High-resolution frame image export.
-- PDF export.
-- README export.
-- Export validation checks.
+- 中文三栏编辑器。
+- 项目状态模型。
+- 素材上传和本地保存。
+- 二维排版画布。
+- 基础裁剪、缩放、拖拽。
 
-Exit criteria:
+退出标准：
 
-- Project export/import round trip is lossless for settings, assets, and
-  transforms.
-- PDF and image exports use correct physical dimensions.
+- 用户能创建项目、上传素材、排列叶片、刷新后恢复草稿。
 
-### Phase 3: Preview and Polish
+### 阶段 2：打印导出
 
-Deliverables:
+交付物：
 
-- Page flip preview.
-- Scroll preview.
-- Responsive editor layout.
-- Error and empty states.
-- Initial visual polish.
+- 项目包导入导出。
+- 高清 frame 图片导出。
+- PDF 导出。
+- README 导出。
+- 导出前检查。
 
-Exit criteria:
+退出标准：
 
-- App is usable at desktop and `390x844` mobile viewport.
-- Preview confirms the same geometry as export.
+- 项目包往返不丢失设置、素材、顺序和变换。
+- PDF 和图片导出使用正确物理尺寸。
 
-### Phase 4: Optional Product Expansion
+### 阶段 3：预览与体验打磨
 
-Deliverables depend on user approval:
+交付物：
 
-- Recording.
-- Watermarking.
-- Templates.
-- Cloud/account/commercial layer.
+- 翻页预览。
+- 卷动预览。
+- 响应式编辑体验。
+- 空状态和错误状态。
+- 初步视觉打磨。
 
-## Risks
+退出标准：
 
-### Print Accuracy
+- 桌面端和 `390x844` 移动视口可用。
+- 预览几何与导出几何一致。
 
-Risk: screen layout looks correct but printed assets do not assemble correctly.
+### 阶段 4：可选产品扩展
 
-Mitigation: keep centimeters as canonical units, generate calibration pages, and
-test PDF physical dimensions.
+按用户批准决定：
 
-### Browser Memory
+- 录制。
+- 水印。
+- 模板。
+- 云端/账号/商业层。
 
-Risk: high-resolution images and 300 DPI exports exhaust memory.
+## 风险与缓解
 
-Mitigation: render pages one at a time, cap image sizes, use progress/cancel
-controls, and release canvases.
+### 打印准确性
 
-### Misleading Security Claims
+风险：屏幕上看起来正确，实际打印后无法组装。
 
-Risk: frontend-only encrypted project files are marketed as copy-proof.
+缓解：厘米作为唯一设计单位，导出校准页，测试 PDF 物理尺寸。
 
-Mitigation: avoid DRM claims. Use optional password protection only with
-user-provided passphrases.
+### 浏览器内存
 
-### Scope Creep
+风险：高分辨率素材和 300DPI 导出导致内存不足。
 
-Risk: payment, cloud, AI, templates, and recording delay the core tool.
+缓解：逐页渲染、限制图片尺寸、提供进度与取消、及时释放 canvas。
 
-Mitigation: keep these outside MVP unless explicitly approved.
+### 安全表述误导
 
-## Acceptance Criteria
+风险：纯前端项目包被宣传为不可拷贝。
 
-- A test project with one front scroll image, one back scroll image, and 23 inner
-  pages can be created.
-- Changing slice width updates page placement and export dimensions.
-- Project package export and import preserve settings, assets, order, and
-  transforms.
-- Image package contains deterministic frame names and assembly metadata.
-- PDF dimensions match configured centimeter values.
-- README values match exported assets.
-- App builds successfully.
-- Geometry unit tests cover default and edge-case dimensions.
-- Browser check covers desktop and `390x844` mobile width.
+缓解：不做 DRM 承诺。如增加密码保护，必须使用用户口令派生密钥。
 
-## Research Links
+### 范围膨胀
 
-- Dayu docs: https://dayu.liberseek.com/docs/
-- Dayu quick start: https://dayu.liberseek.com/docs/guide/getting-started.html
-- Dayu binding specs: https://dayu.liberseek.com/docs/guide/binding-specs.html
-- Dayu editor docs: https://dayu.liberseek.com/docs/guide/editor.html
-- Dayu import/export docs:
-  https://dayu.liberseek.com/docs/guide/export-import.html
-- Dayu recording docs: https://dayu.liberseek.com/docs/guide/recording.html
-- Dayu parameter docs: https://dayu.liberseek.com/docs/guide/specs.html
-- Palace Museum xuanfeng binding entry:
-  https://www.dpm.org.cn/lemmas/242384.html
+风险：支付、云端、AI、模板、录制抢占核心编辑时间。
+
+缓解：所有非 MVP 能力必须先进入 Dayu 功能对照表，再按阶段推进。
+
+## 验收标准
+
+- 创建包含 1 张正面长卷、1 张背面长卷和 23 张内页图的测试项目。
+- 修改鳞片露出宽度后，叶片位置和导出尺寸同步变化。
+- 项目包导出再导入后保留设置、素材、顺序和变换。
+- 图片包包含稳定命名的 frame 文件和 manifest。
+- PDF 物理尺寸与厘米设置一致。
+- README 参数与导出结果一致。
+- `npm test`、`npm run lint`、`npm run build` 通过。
+- 浏览器检查桌面和 `390x844` 移动视口。

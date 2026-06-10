@@ -81,7 +81,7 @@ describe('binding geometry', () => {
         sliceWidthCm: 0,
       }),
     ).toEqual({
-      errors: ['sliceWidthCm must be greater than 0'],
+      errors: ['鳞片露出宽度必须大于 0'],
       warnings: [],
     })
   })
@@ -95,7 +95,7 @@ describe('binding geometry', () => {
       }),
     ).toEqual({
       errors: [],
-      warnings: ['sliceWidthCm is greater than pasteWidthCm'],
+      warnings: ['鳞片露出宽度大于粘贴宽度'],
     })
   })
 })

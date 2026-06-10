@@ -6,6 +6,7 @@ import {
   validateBindingSettings,
   type BindingSettings,
 } from './modules/binding/geometry'
+import { DEFAULT_BINDING_SETTINGS } from './modules/binding/presets'
 
 type NumericSettingKey =
   | 'artworkHeightCm'
@@ -15,15 +16,11 @@ type NumericSettingKey =
   | 'leafCount'
   | 'dpi'
 
-const defaultSettings: BindingSettings = {
-  artworkHeightCm: 30,
-  visiblePageWidthCm: 22,
-  pasteWidthCm: 2,
-  sliceWidthCm: 2,
-  leafCount: 23,
-  edgeStyle: 'straight',
-  orientation: 'horizontal',
-  dpi: 300,
+type MaterialSlot = {
+  id: string
+  title: string
+  status: string
+  meta: string
 }
 
 const controls: Array<{
@@ -36,60 +33,83 @@ const controls: Array<{
 }> = [
   {
     key: 'artworkHeightCm',
-    label: 'Artwork height',
+    label: '画心高度',
     min: 5,
     max: 80,
     step: 0.1,
-    unit: 'cm',
+    unit: '厘米',
   },
   {
     key: 'visiblePageWidthCm',
-    label: 'Visible page width',
+    label: '页面可视宽度',
     min: 5,
     max: 80,
     step: 0.1,
-    unit: 'cm',
+    unit: '厘米',
   },
   {
     key: 'pasteWidthCm',
-    label: 'Paste width',
+    label: '粘贴宽度',
     min: 0.5,
     max: 10,
     step: 0.1,
-    unit: 'cm',
+    unit: '厘米',
   },
   {
     key: 'sliceWidthCm',
-    label: 'Slice width',
+    label: '鳞片露出宽度',
     min: 0.5,
     max: 10,
     step: 0.1,
-    unit: 'cm',
+    unit: '厘米',
   },
   {
     key: 'leafCount',
-    label: 'Leaf count',
+    label: '叶片数量',
     min: 1,
     max: 80,
     step: 1,
-    unit: 'leaves',
+    unit: '张',
   },
   {
     key: 'dpi',
-    label: 'Export DPI',
+    label: '导出精度',
     min: 72,
     max: 600,
     step: 1,
-    unit: 'dpi',
+    unit: 'DPI',
   },
 ]
 
+const materialSlots: MaterialSlot[] = [
+  {
+    id: 'front',
+    title: '正面长卷',
+    status: '未上传',
+    meta: '展开时显示',
+  },
+  {
+    id: 'back',
+    title: '背面长卷',
+    status: '未上传',
+    meta: '收卷时参考',
+  },
+]
+
+const edgeStyleLabels: Record<BindingSettings['edgeStyle'], string> = {
+  straight: '直边',
+  wave: '波浪',
+  sawtooth: '锯齿',
+}
+
 function formatCm(value: number) {
-  return `${Number(value.toFixed(2))} cm`
+  return `${Number(value.toFixed(2))} 厘米`
 }
 
 function App() {
-  const [settings, setSettings] = useState<BindingSettings>(defaultSettings)
+  const [settings, setSettings] = useState<BindingSettings>(
+    DEFAULT_BINDING_SETTINGS,
+  )
 
   const derived = useMemo(
     () => computeDerivedDimensions(settings),
@@ -104,6 +124,7 @@ function App() {
   const previewScale = 6
   const previewWidth = derived.scrollArtworkLengthCm * previewScale
   const previewHeight = settings.artworkHeightCm * previewScale
+  const visibleLeaves = leaves.slice(0, 8)
 
   function updateNumber(key: NumericSettingKey, value: string) {
     const parsed = Number(value)
@@ -120,20 +141,129 @@ function App() {
   return (
     <main className="studio-shell">
       <header className="topbar">
-        <div>
-          <p className="eyebrow">LiberSeek craft lab</p>
-          <h1>Dragon Scale Studio</h1>
+        <div className="brand-lockup">
+          <span className="seal-mark">鳞</span>
+          <div>
+            <p className="eyebrow">LiberSeek 非遗装帧实验室</p>
+            <h1>鳞卷工坊</h1>
+          </div>
         </div>
-        <div className="status-pill">Planning build</div>
+
+        <nav className="toolbar" aria-label="项目工具">
+          <button type="button">新建</button>
+          <button type="button" disabled>
+            导入
+          </button>
+          <button type="button" disabled>
+            保存
+          </button>
+          <button type="button" disabled>
+            导出
+          </button>
+          <button type="button" disabled>
+            预览
+          </button>
+          <button type="button" disabled>
+            帮助
+          </button>
+        </nav>
       </header>
 
-      <section className="workspace" aria-label="Dragon scale binding workspace">
-        <aside className="panel settings-panel" aria-label="Binding settings">
-          <div className="panel-heading">
-            <h2>Binding setup</h2>
-            <button type="button" onClick={() => setSettings(defaultSettings)}>
-              Reset
-            </button>
+      <section className="workspace" aria-label="龙鳞装编辑器">
+        <aside className="side-panel material-panel" aria-label="素材">
+          <div className="panel-title">
+            <p className="eyebrow">素材</p>
+            <h2>长卷与叶片</h2>
+          </div>
+
+          <div className="material-list">
+            {materialSlots.map((slot) => (
+              <section className="material-row" key={slot.id}>
+                <div className="slot-thumb" aria-hidden="true" />
+                <div>
+                  <h3>{slot.title}</h3>
+                  <p>{slot.meta}</p>
+                </div>
+                <span>{slot.status}</span>
+              </section>
+            ))}
+          </div>
+
+          <div className="leaf-stack">
+            <div className="leaf-stack-header">
+              <div>
+                <h3>内页叶片</h3>
+                <p>{settings.leafCount} 张</p>
+              </div>
+              <button type="button" disabled>
+                批量添加
+              </button>
+            </div>
+
+            <ol>
+              {visibleLeaves.map((leaf) => (
+                <li key={leaf.index}>
+                  <span>{String(leaf.index + 1).padStart(2, '0')}</span>
+                  <strong>叶片 {leaf.index + 1}</strong>
+                  <em>空</em>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </aside>
+
+        <section className="canvas-panel" aria-label="装帧画布">
+          <div className="canvas-header">
+            <div>
+              <p className="eyebrow">二维装帧画布</p>
+              <h2>龙鳞排布</h2>
+            </div>
+            <div className="canvas-meta">
+              <span>{edgeStyleLabels[settings.edgeStyle]}</span>
+              <span>{settings.leafCount} 张叶片</span>
+            </div>
+          </div>
+
+          <div className="scroll-stage">
+            <div
+              className="scroll-base"
+              style={{
+                width: `${previewWidth}px`,
+                height: `${previewHeight}px`,
+              }}
+            >
+              <div className="ruler horizontal-ruler" aria-hidden="true" />
+              <div className="ruler vertical-ruler" aria-hidden="true" />
+              {leaves.map((leaf) => (
+                <div
+                  className="leaf"
+                  key={leaf.index}
+                  style={{
+                    width: `${leaf.widthCm * previewScale}px`,
+                    height: `${leaf.heightCm * previewScale}px`,
+                    transform: `translateX(${leaf.xCm * previewScale}px)`,
+                    zIndex: leaf.index + 1,
+                  }}
+                >
+                  <div
+                    className="paste-zone"
+                    style={{
+                      width: `${leaf.pasteRect.widthCm * previewScale}px`,
+                    }}
+                  />
+                  <div className="visible-zone">
+                    <span>{leaf.index + 1}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <aside className="side-panel inspector-panel" aria-label="参数">
+          <div className="panel-title">
+            <p className="eyebrow">参数</p>
+            <h2>装帧设置</h2>
           </div>
 
           <div className="control-list">
@@ -156,72 +286,36 @@ function App() {
               </label>
             ))}
           </div>
-        </aside>
 
-        <section className="preview-panel" aria-label="Binding preview">
-          <div className="preview-header">
-            <div>
-              <p className="eyebrow">WYSIWYG geometry</p>
-              <h2>Leaf placement preview</h2>
-            </div>
-            <span>{settings.edgeStyle}</span>
-          </div>
+          <button
+            className="reset-button"
+            type="button"
+            onClick={() => setSettings(DEFAULT_BINDING_SETTINGS)}
+          >
+            恢复默认预设
+          </button>
 
-          <div className="scroll-stage">
-            <div
-              className="scroll-base"
-              style={{
-                width: `${previewWidth}px`,
-                height: `${previewHeight}px`,
-              }}
-            >
-              {leaves.map((leaf) => (
-                <div
-                  className="leaf"
-                  key={leaf.index}
-                  style={{
-                    width: `${leaf.widthCm * previewScale}px`,
-                    height: `${leaf.heightCm * previewScale}px`,
-                    transform: `translateX(${leaf.xCm * previewScale}px)`,
-                    zIndex: leaf.index + 1,
-                  }}
-                >
-                  <div
-                    className="paste-zone"
-                    style={{
-                      width: `${leaf.pasteRect.widthCm * previewScale}px`,
-                    }}
-                  />
-                  <div className="leaf-number">{leaf.index + 1}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <aside className="panel metrics-panel" aria-label="Derived dimensions">
-          <h2>Derived output</h2>
           <dl className="metrics">
             <div>
-              <dt>Leaf physical width</dt>
+              <dt>叶片物理宽度</dt>
               <dd>{formatCm(derived.leafPhysicalWidthCm)}</dd>
             </div>
             <div>
-              <dt>Scroll artwork length</dt>
+              <dt>长卷画心长度</dt>
               <dd>{formatCm(derived.scrollArtworkLengthCm)}</dd>
             </div>
             <div>
-              <dt>Page structures</dt>
+              <dt>页面结构数</dt>
               <dd>{derived.pageStructureCount}</dd>
             </div>
             <div>
-              <dt>Frame pixels</dt>
+              <dt>单张叶片像素</dt>
               <dd>
                 {derived.frameWidthPx} x {derived.frameHeightPx}
               </dd>
             </div>
             <div>
-              <dt>Scroll pixels</dt>
+              <dt>长卷像素</dt>
               <dd>
                 {derived.scrollWidthPx} x {derived.scrollHeightPx}
               </dd>
@@ -241,7 +335,7 @@ function App() {
             ))}
             {validation.errors.length === 0 &&
               validation.warnings.length === 0 && (
-                <p className="validation ok">Geometry ready for test export</p>
+                <p className="validation ok">参数可用于测试导出</p>
               )}
           </div>
         </aside>

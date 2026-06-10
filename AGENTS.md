@@ -1,173 +1,173 @@
-# LiberSeek Dragon Scale Studio - Agent Guide
+# 鳞卷工坊 Agent 工作指南
 
-These instructions apply to work inside `D:\codesolo\liberseek`.
+这些规则适用于 `D:\codesolo\liberseek` 内的工作。
 
-## Project Intent
+## 项目意图
 
-This project is a digital creation tool for dragon scale binding, also known as
-xuanfeng binding. It should help users upload scroll artwork and page images,
-lay them out as a dragon scale artwork, preview the structure, export printable
-assets, and preserve editable project files.
+本项目是一个面向龙鳞装/旋风装艺术作品的数字化创作工具。它帮助用户上传长卷和叶片素材，完成龙鳞装排版、预览、导出和实体打印组装。
 
-The project priorities are:
+项目优先级：
 
-1. Accurate binding geometry and craft rules.
-2. Reliable printable exports.
-3. Clear editing experience.
-4. Local-first project storage.
-5. Account, cloud, payment, and service workflows only after the local tool is
-   useful.
+1. 工艺结构和几何计算准确。
+2. 打印导出可靠。
+3. 中文编辑体验清晰。
+4. 本地优先保存。
+5. 账号、云端、支付和服务流程必须在本地工具可用之后再做。
 
-## Reference Boundary
+## 中文优先规则
 
-Dayu is a public reference for product shape, terminology, and feasibility.
-Do not copy Dayu source code, private implementation details, hard-coded keys,
-branding, visual identity, paid-flow wording, or commercial mechanics.
+- 用户可见 UI 必须使用中文。
+- 文档优先使用中文。
+- 导出 README、校验提示、按钮、菜单、参数名都必须中文化。
+- 源码类型名、函数名、字段名、路径名可以保持英文，以保证工程可维护。
+- 常用中文术语必须一致：画心高度、页面可视宽度、粘贴宽度、鳞片露出宽度、叶片数量、长卷画心长度。
 
-Dragon scale binding and xuanfeng binding are traditional craft concepts and may
-be implemented independently. Treat modern patent or product details as risk
-and research signals, not as copyable design.
+## Dayu 参考边界
 
-## Working Rules
+Dayu 只能作为公开功能参考和可行性信号。
 
-- Read the real repo state before changing files.
-- Keep changes scoped to this project.
-- Do not commit, push, deploy, publish, or initialize external services unless
-  the user explicitly asks.
-- Do not introduce login, payment, order, cloud sync, template marketplace, or
-  print-service back office unless the current task explicitly requires it.
-- Prefer reversible local files and documented decisions over hidden setup.
-- Do not claim frontend-only encryption prevents asset extraction. Use precise
-  language such as project package, password protection, or local archive.
-- Keep Chinese product terminology consistent, but source code identifiers should
-  stay ASCII unless an existing file already requires otherwise.
+不要复制：
 
-## MVP Scope
+- Dayu 源代码。
+- 私有实现细节。
+- 硬编码密钥。
+- 品牌、图标、视觉身份。
+- 付费流程和会员文案。
+- 商业化机制。
+- `.dayu` 格式的具体实现。
 
-The MVP must support:
+龙鳞装/旋风装是传统工艺概念，可以独立实现。现代专利或竞品细节只能作为风险和研究信号，不能直接照搬。
 
-- New project creation and size presets.
-- Front scroll image, back scroll image, and inner page image upload.
-- Batch upload for inner pages.
-- Page ordering, replacement, and removal.
-- Per-image crop, scale, rotation, and position transforms.
-- Dragon scale binding geometry calculation.
-- A 2D WYSIWYG layout surface.
-- Local draft persistence.
-- Project import and export.
-- High-resolution image package export.
-- PDF export.
-- README assembly instructions export.
+## 工作规则
 
-The MVP must not include:
+- 改动前先读当前仓库状态。
+- 保持改动聚焦在本项目。
+- 除非用户明确要求，不提交、不推送、不部署、不发布、不初始化外部服务。
+- 除非当前任务明确要求，不引入登录、支付、订单、云同步、模板市场或打印服务后台。
+- 优先做可回退的本地文件和清晰文档，不做隐藏设置。
+- 不要声称纯前端项目包可以防止素材提取；只能使用“项目包”“可选密码保护”“本地归档”等准确说法。
 
-- Account login.
-- Payment or subscription.
-- Order management.
-- Cloud project storage.
-- Community publishing.
-- Template marketplace.
-- Print fulfillment operations.
-- DRM-style promises.
+## MVP 范围
 
-## Technical Direction
+MVP 必须支持：
 
-Default stack:
+- 新建项目和尺寸预设。
+- 正面长卷、背面长卷、内页图片上传。
+- 内页批量上传。
+- 叶片排序、替换、删除。
+- 每张图片的裁剪、缩放、旋转、定位。
+- 龙鳞装几何计算。
+- 二维所见即所得画布。
+- 本地草稿保存。
+- 项目导入导出。
+- 高清图片包导出。
+- PDF 导出。
+- 中文 README 组装说明导出。
 
-- Vite.
-- React.
-- TypeScript.
-- Zustand for editor state.
-- Dexie and IndexedDB for local projects and image blobs.
-- Canvas 2D for the first editor and printable rendering path.
-- Three.js with react-three-fiber for later 3D preview.
-- JSZip or fflate for project and export packages.
-- jsPDF or pdf-lib for PDF export.
-- Vitest for geometry and export logic.
-- Playwright for browser verification.
+MVP 不包含：
 
-Use centimeters as the canonical design unit. Convert to pixels only at render
-and export boundaries with an explicit DPI.
+- 账号登录。
+- 支付或订阅。
+- 订单管理。
+- 云端项目存储。
+- 社区发布。
+- 模板市场。
+- 打印履约后台。
+- DRM 式承诺。
 
-## Architecture Boundaries
+## 技术方向
 
-Keep these module boundaries:
+默认技术栈：
 
-- `binding`: geometry, dimension conversion, craft rules, page placement.
-- `assets`: image upload, decode, validation, and local blob handling.
-- `editor`: 2D editing surface and interaction.
-- `preview`: page flip and scroll preview.
-- `export`: PNG, PDF, ZIP, and README generation.
-- `project`: project schema, import, export, and version migration.
-- `recorder`: screen recording and watermarking after the MVP export path works.
+- Vite。
+- React。
+- TypeScript。
+- Zustand 管理编辑状态。
+- Dexie/IndexedDB 存储本地项目和图片 Blob。
+- Canvas 2D 作为第一版编辑器和打印渲染路径。
+- Three.js/react-three-fiber 用于后续 3D 预览。
+- JSZip 或 fflate 打包项目和导出文件。
+- jsPDF 或 pdf-lib 生成 PDF。
+- Vitest 测试几何和导出逻辑。
+- Playwright 或可用浏览器工具做界面验证。
 
-Geometry and export planning must be pure functions where possible. React
-components consume calculated layouts; they should not own binding math.
+厘米是标准设计单位。只有在渲染和导出边界才能根据明确 DPI 转换为像素。
 
-## Craft Accuracy
+## 模块边界
 
-Always distinguish these terms:
+保持这些模块边界：
 
-- Artwork height.
-- Scroll artwork length.
-- Visible page width.
-- Physical page width.
-- Paste width.
-- Slice or exposed width.
-- Leaf count.
-- Page structure count.
-- Scroll margin.
-- Print DPI.
-- PDF physical page size.
+- `binding`：几何、尺寸换算、工艺规则、叶片位置。
+- `assets`：图片上传、解码、校验、本地 Blob 管理。
+- `editor`：二维编辑器和交互。
+- `preview`：翻页与卷动预览。
+- `export`：PNG、PDF、ZIP 和 README 生成。
+- `project`：项目 schema、导入、导出、版本迁移。
+- `recorder`：在 MVP 导出路径稳定后实现录屏和水印。
 
-Before changing export behavior, check:
+几何和导出规划尽量保持纯函数。React 组件消费计算结果，不拥有核心装帧数学。
 
-- Image resolution requirements.
-- Physical page size.
-- PDF size and orientation.
-- Leaf count and frame count.
-- Paste width and slice width validity.
-- Project export/import round trip.
-- README instructions versus actual generated assets.
+## 工艺准确性
 
-## Quality Gates
+必须区分：
 
-For code changes, run relevant gates exposed by the repo:
+- 画心高度。
+- 长卷画心长度。
+- 页面可视宽度。
+- 叶片物理宽度。
+- 粘贴宽度。
+- 鳞片露出宽度。
+- 叶片数量。
+- 页面结构数。
+- 长卷留边。
+- 打印 DPI。
+- PDF 物理页面尺寸。
 
-- TypeScript typecheck.
-- Lint.
-- Unit tests.
-- Build.
-- Playwright browser check.
+修改导出行为前必须检查：
 
-Frontend changes should be checked at desktop and mobile widths. Use `390x844`
-as one default mobile viewport.
+- 图片分辨率要求。
+- 物理页面尺寸。
+- PDF 大小和方向。
+- 叶片数和 frame 数。
+- 粘贴宽度与鳞片露出宽度是否合法。
+- 项目导入导出往返。
+- README 参数是否与生成资产一致。
 
-Export changes must verify:
+## 质量门槛
 
-- Image package downloads and extracts.
-- PDF physical dimensions are correct.
-- Project import/export round trip preserves settings and transforms.
-- README parameters match generated assets.
+代码变更后按风险运行：
 
-If a gate is skipped, report the reason.
+- TypeScript typecheck。
+- lint。
+- 单元测试。
+- build。
+- 浏览器检查。
 
-## Documentation First
+前端变更需要检查桌面和移动端宽度，默认移动视口为 `390x844`。
 
-Before initializing the implementation project, establish these docs:
+导出变更必须验证：
 
-- `docs/product-plan.md`.
-- `docs/craft-spec.md`.
-- `docs/export-spec.md`.
+- 图片包可下载并解压。
+- PDF 物理尺寸正确。
+- 项目导入导出往返保留设置和变换。
+- README 参数匹配导出资产。
 
-These docs define the product, craft model, and export contract. Keep them
-updated when implementation decisions change the project baseline.
+跳过任何验证都必须说明原因。
 
-## Security And Secrets
+## 文档基线
 
-- Do not write real API keys, tokens, passwords, cookies, or bearer credentials
-  into code, docs, examples, or chat.
-- Keep secrets in ignored `.env.local` files or provider-managed secret stores.
-- If project password protection is added, derive keys from user-provided
-  passphrases. Never use hard-coded shared encryption keys.
-- Treat credentials committed to git history as exposed and require rotation.
+项目基线文档：
+
+- `docs/product-plan.md`。
+- `docs/dayu-feature-map.md`。
+- `docs/craft-spec.md`。
+- `docs/export-spec.md`。
+
+实现决策改变基线时，必须同步更新文档。
+
+## 安全与密钥
+
+- 不要把真实 API key、token、密码、cookie 或 bearer 凭据写入代码、文档、示例或聊天。
+- 密钥只能放在忽略的 `.env.local` 或部署平台 secret store。
+- 如添加项目密码保护，必须从用户口令派生密钥，禁止硬编码共享密钥。
+- 如果凭据进入 git 历史，视为已暴露，必须轮换。

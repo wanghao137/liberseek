@@ -99,27 +99,27 @@ export function validateBindingSettings(
   const warnings: string[] = []
 
   if (settings.artworkHeightCm <= 0) {
-    errors.push('artworkHeightCm must be greater than 0')
+    errors.push('画心高度必须大于 0')
   }
 
   if (settings.visiblePageWidthCm <= 0) {
-    errors.push('visiblePageWidthCm must be greater than 0')
+    errors.push('页面可视宽度必须大于 0')
   }
 
   if (settings.pasteWidthCm <= 0) {
-    errors.push('pasteWidthCm must be greater than 0')
+    errors.push('粘贴宽度必须大于 0')
   }
 
   if (settings.sliceWidthCm <= 0) {
-    errors.push('sliceWidthCm must be greater than 0')
+    errors.push('鳞片露出宽度必须大于 0')
   }
 
   if (settings.leafCount < 1) {
-    errors.push('leafCount must be at least 1')
+    errors.push('叶片数量至少为 1')
   }
 
   if (settings.dpi <= 0) {
-    errors.push('dpi must be greater than 0')
+    errors.push('导出 DPI 必须大于 0')
   }
 
   if (
@@ -127,7 +127,7 @@ export function validateBindingSettings(
     settings.sliceWidthCm > 0 &&
     settings.pasteWidthCm > 0
   ) {
-    warnings.push('sliceWidthCm is greater than pasteWidthCm')
+    warnings.push('鳞片露出宽度大于粘贴宽度')
   }
 
   return {
