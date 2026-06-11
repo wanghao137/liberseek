@@ -9,6 +9,8 @@
 - 默认工艺参数测试。
 - 派生尺寸、叶片排布、像素换算、校验信息的单元测试。
 - 第一版中文三栏编辑器界面。
+- 正面长卷、背面长卷和内页叶片的本地上传预览。
+- IndexedDB 本地草稿保存、启动恢复和新建项目重置。
 
 ## 开发命令
 
@@ -52,6 +54,8 @@ npm run build
 - 鳞片露出宽度：`2cm`
 - 叶片数量：`23`
 - 导出 DPI：`300`
+
+项目状态模型位于 `src/modules/project/project.ts`。本地草稿保存位于 `src/modules/storage/draft.ts`，使用浏览器 IndexedDB 保存项目 JSON 和图片 Blob；运行时预览 URL 不会写入草稿。
 
 ## 产品边界
 
