@@ -13,6 +13,7 @@ import {
 } from './modules/project/project'
 import {
   exportDscalePackage,
+  formatDscalePackageImportError,
   importDscalePackage,
 } from './modules/project/dscalePackage'
 import {
@@ -33,6 +34,7 @@ type NumericSettingKey =
   | 'dpi'
 
 type MaterialRole = Extract<ProjectAssetRole, 'front' | 'back'>
+type PackageStatus = 'idle' | 'importing' | 'exporting'
 
 type MaterialSlot = {
   id: MaterialRole
@@ -176,12 +178,17 @@ function getImageFiles(files: FileList | null): File[] {
   return Array.from(files ?? []).filter((file) => file.type.startsWith('image/'))
 }
 
+function waitForNextFrame(): Promise<void> {
+  return new Promise((resolve) => window.requestAnimationFrame(() => resolve()))
+}
+
 function App() {
   const [project, setProject] = useState<RuntimeDraftProject>(() =>
     createRuntimeProject(),
   )
   const [notice, setNotice] = useState('正在检查本地草稿。')
   const [saveStatus, setSaveStatus] = useState('尚未保存')
+  const [packageStatus, setPackageStatus] = useState<PackageStatus>('idle')
   const frontInputRef = useRef<HTMLInputElement>(null)
   const backInputRef = useRef<HTMLInputElement>(null)
   const leavesInputRef = useRef<HTMLInputElement>(null)
@@ -212,6 +219,7 @@ function App() {
   const previewScale = 6
   const previewWidth = derived.scrollArtworkLengthCm * previewScale
   const previewHeight = settings.artworkHeightCm * previewScale
+  const isPackageBusy = packageStatus !== 'idle'
 
   useEffect(() => {
     const objectUrls = objectUrlsRef.current
@@ -340,7 +348,14 @@ function App() {
   }
 
   async function handleExportPackage() {
-    setNotice('正在生成 .dscale.zip 项目包。')
+    if (isPackageBusy) {
+      return
+    }
+
+    setPackageStatus('exporting')
+    setNotice('正在导出项目包，请保持当前页面打开。')
+    setSaveStatus('导出前正在保存草稿...')
+    await waitForNextFrame()
 
     try {
       await saveActiveDraft(project)
@@ -357,7 +372,10 @@ function App() {
       setSaveStatus(`导出前已保存 ${new Date().toLocaleTimeString('zh-CN')}`)
       setNotice('项目包已生成，可重新导入继续编辑。')
     } catch {
+      setSaveStatus('项目包导出失败')
       setNotice('项目包导出失败，请检查浏览器下载权限。')
+    } finally {
+      setPackageStatus('idle')
     }
   }
 
@@ -369,7 +387,15 @@ function App() {
       return
     }
 
-    setNotice('正在导入项目包。')
+    if (isPackageBusy) {
+      setNotice('项目包处理中，请稍后再试。')
+      return
+    }
+
+    setPackageStatus('importing')
+    setNotice(`正在导入项目包：${file.name}`)
+    setSaveStatus('正在恢复项目包草稿...')
+    await waitForNextFrame()
 
     try {
       const importedProject = await importDscalePackage(file)
@@ -383,8 +409,11 @@ function App() {
       await saveActiveDraft(runtimeProject)
       setSaveStatus(`已保存导入草稿 ${new Date().toLocaleTimeString('zh-CN')}`)
       setNotice(`已导入项目包：${file.name}`)
-    } catch {
-      setNotice('项目包导入失败，请确认文件为有效的 .dscale.zip。')
+    } catch (error) {
+      setSaveStatus('项目包导入失败')
+      setNotice(formatDscalePackageImportError(error))
+    } finally {
+      setPackageStatus('idle')
     }
   }
 
@@ -601,17 +630,35 @@ function App() {
         </div>
 
         <nav className="toolbar" aria-label="项目工具">
-          <button type="button" onClick={() => void handleNewProject()}>
+          <button
+            type="button"
+            disabled={isPackageBusy}
+            onClick={() => void handleNewProject()}
+          >
             新建
           </button>
-          <button type="button" onClick={() => packageInputRef.current?.click()}>
-            导入
+          <button
+            type="button"
+            data-testid="package-import-button"
+            disabled={isPackageBusy}
+            onClick={() => packageInputRef.current?.click()}
+          >
+            {packageStatus === 'importing' ? '导入中' : '导入'}
           </button>
-          <button type="button" onClick={() => void persistNow()}>
+          <button
+            type="button"
+            disabled={isPackageBusy}
+            onClick={() => void persistNow()}
+          >
             保存
           </button>
-          <button type="button" onClick={() => void handleExportPackage()}>
-            导出
+          <button
+            type="button"
+            data-testid="package-export-button"
+            disabled={isPackageBusy}
+            onClick={() => void handleExportPackage()}
+          >
+            {packageStatus === 'exporting' ? '导出中' : '导出'}
           </button>
           <button type="button" disabled title="预览将在画布编辑器稳定后接入">
             预览
@@ -627,15 +674,21 @@ function App() {
           <div className="panel-title">
             <p className="eyebrow">素材</p>
             <h2>长卷与叶片</h2>
-            <p className="panel-note">{notice}</p>
-            <p className="save-status">{saveStatus}</p>
+            <p className="panel-note" data-testid="notice" aria-live="polite">
+              {notice}
+            </p>
+            <p className="save-status" data-testid="save-status" aria-live="polite">
+              {saveStatus}
+            </p>
           </div>
 
           <input
             ref={packageInputRef}
             className="hidden-input"
+            data-testid="package-input"
             type="file"
             accept={PACKAGE_ACCEPT}
+            disabled={isPackageBusy}
             onChange={(event) => {
               void handleImportPackage(event.currentTarget.files)
               event.currentTarget.value = ''

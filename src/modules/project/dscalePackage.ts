@@ -25,6 +25,10 @@ type DscaleProjectJson = Omit<WorkshopProject, 'assets'> & {
   assets: PackagedAsset[]
 }
 
+const PACKAGE_IMPORT_FALLBACK =
+  '项目包导入失败，请确认文件为有效的 .dscale.zip。'
+const KNOWN_PACKAGE_ERROR_PREFIX = '项目包'
+
 function extensionFromAsset(asset: PackageableAsset): string {
   const nameExtension = asset.name.match(/\.([a-zA-Z0-9]+)$/)?.[1]
 
@@ -86,13 +90,30 @@ function readProjectJson(files: Record<string, Uint8Array>): DscaleProjectJson {
     throw new Error('项目包缺少 project.json')
   }
 
-  const parsed = JSON.parse(strFromU8(projectFile)) as DscaleProjectJson
+  let parsed: DscaleProjectJson
+
+  try {
+    parsed = JSON.parse(strFromU8(projectFile)) as DscaleProjectJson
+  } catch {
+    throw new Error('项目包清单无法解析')
+  }
 
   if (parsed.schemaVersion !== 1 || parsed.app !== 'linjuan-workshop') {
     throw new Error('项目包版本不受支持')
   }
 
   return parsed
+}
+
+export function formatDscalePackageImportError(error: unknown): string {
+  if (
+    error instanceof Error &&
+    error.message.startsWith(KNOWN_PACKAGE_ERROR_PREFIX)
+  ) {
+    return error.message
+  }
+
+  return PACKAGE_IMPORT_FALLBACK
 }
 
 export async function exportDscalePackage(
