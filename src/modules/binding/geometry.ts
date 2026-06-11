@@ -70,24 +70,25 @@ export function computeDerivedDimensions(
 
 export function computeLeafLayout(settings: BindingSettings): LeafLayout[] {
   const { leafPhysicalWidthCm } = computeDerivedDimensions(settings)
+  const isVertical = settings.orientation === 'vertical'
 
   return Array.from({ length: settings.leafCount }, (_, index) => ({
     index,
-    xCm: index * settings.sliceWidthCm,
-    yCm: 0,
-    widthCm: leafPhysicalWidthCm,
-    heightCm: settings.artworkHeightCm,
+    xCm: isVertical ? 0 : index * settings.sliceWidthCm,
+    yCm: isVertical ? index * settings.sliceWidthCm : 0,
+    widthCm: isVertical ? settings.artworkHeightCm : leafPhysicalWidthCm,
+    heightCm: isVertical ? leafPhysicalWidthCm : settings.artworkHeightCm,
     pasteRect: {
       xCm: 0,
       yCm: 0,
-      widthCm: settings.pasteWidthCm,
-      heightCm: settings.artworkHeightCm,
+      widthCm: isVertical ? settings.artworkHeightCm : settings.pasteWidthCm,
+      heightCm: isVertical ? settings.pasteWidthCm : settings.artworkHeightCm,
     },
     visibleRect: {
-      xCm: settings.pasteWidthCm,
-      yCm: 0,
-      widthCm: settings.visiblePageWidthCm,
-      heightCm: settings.artworkHeightCm,
+      xCm: isVertical ? 0 : settings.pasteWidthCm,
+      yCm: isVertical ? settings.pasteWidthCm : 0,
+      widthCm: isVertical ? settings.artworkHeightCm : settings.visiblePageWidthCm,
+      heightCm: isVertical ? settings.visiblePageWidthCm : settings.artworkHeightCm,
     },
   }))
 }
