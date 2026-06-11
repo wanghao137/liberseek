@@ -11,6 +11,7 @@
 - 第一版中文三栏编辑器界面。
 - 正面长卷、背面长卷和内页叶片的本地上传预览。
 - IndexedDB 本地草稿保存、启动恢复和新建项目重置。
+- `.dscale.zip` 项目包导出和重新导入。
 
 ## 开发命令
 
@@ -56,6 +57,8 @@ npm run build
 - 导出 DPI：`300`
 
 项目状态模型位于 `src/modules/project/project.ts`。本地草稿保存位于 `src/modules/storage/draft.ts`，使用浏览器 IndexedDB 保存项目 JSON 和图片 Blob；运行时预览 URL 不会写入草稿。
+
+项目包导入导出位于 `src/modules/project/dscalePackage.ts`。项目包使用自有 `.dscale.zip` 格式，包含 `project.json` 和 `assets/` 下的原始素材 Blob，可离线重新导入继续编辑。
 
 ## 产品边界
 

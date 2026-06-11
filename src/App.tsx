@@ -12,6 +12,10 @@ import {
   type ProjectAssetRole,
 } from './modules/project/project'
 import {
+  exportDscalePackage,
+  importDscalePackage,
+} from './modules/project/dscalePackage'
+import {
   clearActiveDraft,
   loadActiveDraft,
   saveActiveDraft,
@@ -38,6 +42,7 @@ type MaterialSlot = {
 }
 
 const IMAGE_ACCEPT = 'image/png,image/jpeg,image/webp,image/gif'
+const PACKAGE_ACCEPT = '.dscale.zip,application/zip,application/x-zip-compressed'
 
 const controls: Array<{
   key: NumericSettingKey
@@ -138,6 +143,12 @@ function createAssetId(role: ProjectAssetRole) {
   return `${role}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
 }
 
+function packageFileName(title: string) {
+  const cleaned = title.trim().replace(/[\\/:*?"<>|]/g, '-')
+
+  return `${cleaned || '未命名项目'}.dscale.zip`
+}
+
 function readImageSize(previewUrl: string): Promise<{
   widthPx: number | null
   heightPx: number | null
@@ -174,6 +185,7 @@ function App() {
   const frontInputRef = useRef<HTMLInputElement>(null)
   const backInputRef = useRef<HTMLInputElement>(null)
   const leavesInputRef = useRef<HTMLInputElement>(null)
+  const packageInputRef = useRef<HTMLInputElement>(null)
   const objectUrlsRef = useRef<Set<string>>(new Set())
   const draftReadyRef = useRef(false)
   const autoSaveTimerRef = useRef<number | undefined>(undefined)
@@ -308,6 +320,13 @@ function App() {
     objectUrlsRef.current.delete(asset.previewUrl)
   }
 
+  function createPreviewUrl(blob: Blob) {
+    const previewUrl = URL.createObjectURL(blob)
+
+    objectUrlsRef.current.add(previewUrl)
+    return previewUrl
+  }
+
   async function persistNow(message = '已保存到本地草稿。') {
     setSaveStatus('正在保存...')
 
@@ -317,6 +336,55 @@ function App() {
     } catch {
       setSaveStatus('保存失败')
       setNotice('本地草稿保存失败，请检查浏览器存储权限。')
+    }
+  }
+
+  async function handleExportPackage() {
+    setNotice('正在生成 .dscale.zip 项目包。')
+
+    try {
+      await saveActiveDraft(project)
+      const packageBlob = await exportDscalePackage(project)
+      const downloadUrl = URL.createObjectURL(packageBlob)
+      const link = document.createElement('a')
+
+      link.href = downloadUrl
+      link.download = packageFileName(project.title)
+      document.body.append(link)
+      link.click()
+      link.remove()
+      window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 0)
+      setSaveStatus(`导出前已保存 ${new Date().toLocaleTimeString('zh-CN')}`)
+      setNotice('项目包已生成，可重新导入继续编辑。')
+    } catch {
+      setNotice('项目包导出失败，请检查浏览器下载权限。')
+    }
+  }
+
+  async function handleImportPackage(files: FileList | null) {
+    const [file] = Array.from(files ?? [])
+
+    if (!file) {
+      setNotice('请选择 .dscale.zip 项目包。')
+      return
+    }
+
+    setNotice('正在导入项目包。')
+
+    try {
+      const importedProject = await importDscalePackage(file)
+      const runtimeProject = toRuntimeDraftProject(
+        importedProject,
+        createPreviewUrl,
+      )
+
+      project.assets.forEach(revokeAsset)
+      setProject(runtimeProject)
+      await saveActiveDraft(runtimeProject)
+      setSaveStatus(`已保存导入草稿 ${new Date().toLocaleTimeString('zh-CN')}`)
+      setNotice(`已导入项目包：${file.name}`)
+    } catch {
+      setNotice('项目包导入失败，请确认文件为有效的 .dscale.zip。')
     }
   }
 
@@ -536,13 +604,13 @@ function App() {
           <button type="button" onClick={() => void handleNewProject()}>
             新建
           </button>
-          <button type="button" onClick={() => leavesInputRef.current?.click()}>
+          <button type="button" onClick={() => packageInputRef.current?.click()}>
             导入
           </button>
           <button type="button" onClick={() => void persistNow()}>
             保存
           </button>
-          <button type="button" disabled title="打印导出将在项目包稳定后接入">
+          <button type="button" onClick={() => void handleExportPackage()}>
             导出
           </button>
           <button type="button" disabled title="预览将在画布编辑器稳定后接入">
@@ -563,6 +631,16 @@ function App() {
             <p className="save-status">{saveStatus}</p>
           </div>
 
+          <input
+            ref={packageInputRef}
+            className="hidden-input"
+            type="file"
+            accept={PACKAGE_ACCEPT}
+            onChange={(event) => {
+              void handleImportPackage(event.currentTarget.files)
+              event.currentTarget.value = ''
+            }}
+          />
           <input
             ref={frontInputRef}
             className="hidden-input"
