@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Text } from '@react-three/drei'
 import type { ReactNode } from 'react'
@@ -59,6 +59,12 @@ function LoadingFallback(): ReactNode {
 }
 
 export function Preview3D({ leafImages, onClose }: Preview3DProps) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
+
   return (
     <div className="preview-3d-overlay">
       <div className="preview-3d-container">

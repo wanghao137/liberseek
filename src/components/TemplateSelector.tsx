@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { getTemplateList, createProjectFromTemplate, type Template } from '../modules/editor/templateUtils'
 
 type TemplateSelectorProps = {
@@ -9,6 +9,12 @@ type TemplateSelectorProps = {
 export function TemplateSelector({ onSelect, onClose }: TemplateSelectorProps) {
   const templates = getTemplateList()
   const [selectedId, setSelectedId] = useState<string | null>(null)
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
 
   const handleSelect = (template: Template) => {
     setSelectedId(template.id)
