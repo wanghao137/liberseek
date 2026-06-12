@@ -1,9 +1,17 @@
+import { useEffect } from 'react'
+
 type PreviewMenuProps = {
   onSelect: (mode: 'flip' | '3d' | 'scroll') => void
   onClose: () => void
 }
 
 export function PreviewMenu({ onSelect, onClose }: PreviewMenuProps) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
+
   return (
     <div className="preview-menu-overlay" onClick={onClose}>
       <div className="preview-menu" onClick={(e) => e.stopPropagation()}>
