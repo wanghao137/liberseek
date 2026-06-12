@@ -1,0 +1,129 @@
+{
+  "translation": {
+    "app": {
+      "title": "Dragon Scale Studio",
+      "subtitle": "LiberSeek Intangible Heritage Bookbinding Lab"
+    },
+    "toolbar": {
+      "new": "New",
+      "import": "Import",
+      "save": "Save",
+      "export": "Export",
+      "preview": "Preview",
+      "help": "Help"
+    },
+    "material": {
+      "title": "Materials",
+      "subtitle": "Scrolls & Leaves",
+      "frontScroll": "Front Scroll",
+      "backScroll": "Back Scroll",
+      "frontHint": "Display when unfolded",
+      "backHint": "Reference when rolled",
+      "upload": "Upload",
+      "replace": "Replace",
+      "remove": "Remove",
+      "notUploaded": "Not uploaded",
+      "leafPages": "Inner Pages",
+      "batchAdd": "Batch Add",
+      "addedCount": "{{current}} / {{total}} added",
+      "leaf": "Leaf",
+      "emptySlot": "Empty",
+      "select": "Select"
+    },
+    "canvas": {
+      "title": "2D Binding Canvas",
+      "subtitle": "Dragon Scale Layout",
+      "straight": "Straight",
+      "wave": "Wave",
+      "sawtooth": "Sawtooth",
+      "leafCount": "{{count}} leaves",
+      "assignedCount": "{{count}} assigned"
+    },
+    "settings": {
+      "title": "Binding Settings",
+      "artworkHeight": "Artwork Height",
+      "pageWidth": "Visible Page Width",
+      "pasteWidth": "Paste Width",
+      "sliceWidth": "Slice Width",
+      "leafCount": "Leaf Count",
+      "dpi": "Export DPI",
+      "resetDefault": "Reset to Default",
+      "cm": "cm",
+      "sheet": "sheets",
+      "dpiUnit": "DPI"
+    },
+    "metrics": {
+      "leafPhysicalWidth": "Leaf Physical Width",
+      "scrollArtworkLength": "Scroll Artwork Length",
+      "pageStructureCount": "Page Structure Count",
+      "leafPixel": "Single Leaf Pixels",
+      "scrollPixel": "Scroll Pixels",
+      "centimeter": "cm"
+    },
+    "export": {
+      "title": "Export Project",
+      "imagePackage": "Image Package",
+      "imagePackageDesc": "Contains frame images, manifest and README",
+      "pdfPackage": "PDF Package",
+      "pdfPackageDesc": "Contains print pages PDF and calibration",
+      "readme": "README",
+      "readmeDesc": "Chinese assembly instructions",
+      "exporting": "Exporting...",
+      "complete": "Complete",
+      "cancel": "Cancel",
+      "confirm": "Confirm Export"
+    },
+    "preview": {
+      "flip": "Flip Preview",
+      "scroll": "Scroll Preview",
+      "autoScroll": "Auto",
+      "pause": "Pause",
+      "speed": "Speed",
+      "prevPage": "Previous",
+      "nextPage": "Next",
+      "hint": "Use ← → keys to flip, ESC to exit"
+    },
+    "template": {
+      "title": "Select Template",
+      "useTemplate": "Use Template",
+      "leafCount": "{{count}} leaves",
+      "height": "{{count}}cm height"
+    },
+    "recording": {
+      "start": "Start Recording",
+      "pause": "Pause",
+      "resume": "Resume",
+      "stop": "Stop",
+      "recording": "Recording",
+      "paused": "Paused",
+      "unsupported": "Browser does not support recording"
+    },
+    "watermark": {
+      "enable": "Enable Watermark",
+      "text": "Watermark Text",
+      "position": "Position",
+      "opacity": "Opacity",
+      "bottomRight": "Bottom Right",
+      "bottomLeft": "Bottom Left",
+      "topRight": "Top Right",
+      "topLeft": "Top Left",
+      "center": "Center"
+    },
+    "crop": {
+      "title": "Crop Image",
+      "zoom": "Zoom",
+      "rotation": "Rotation",
+      "confirm": "Confirm Crop"
+    },
+    "validation": {
+      "ok": "Materials and parameters ready for export",
+      "hintFront": "Front scroll not uploaded",
+      "hintBack": "Back scroll not uploaded",
+      "hintLeaves": "{{count}} leaf materials missing"
+    },
+    "empty": {
+      "noDraft": "No draft found, new project created.",
+      "waitingSave": "Waiting for first auto-save"
+    }
+  }
+}

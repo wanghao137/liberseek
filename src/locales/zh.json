@@ -1,0 +1,129 @@
+{
+  "translation": {
+    "app": {
+      "title": "鳞卷工坊",
+      "subtitle": "LiberSeek 非遗装帧实验室"
+    },
+    "toolbar": {
+      "new": "新建",
+      "import": "导入",
+      "save": "保存",
+      "export": "导出",
+      "preview": "预览",
+      "help": "帮助"
+    },
+    "material": {
+      "title": "素材",
+      "subtitle": "长卷与叶片",
+      "frontScroll": "正面长卷",
+      "backScroll": "背面长卷",
+      "frontHint": "展开时显示",
+      "backHint": "收卷时参考",
+      "upload": "上传",
+      "replace": "替换",
+      "remove": "移除",
+      "notUploaded": "未上传",
+      "leafPages": "内页叶片",
+      "batchAdd": "批量添加",
+      "addedCount": "已放入 {{current}} / {{total}} 张",
+      "leaf": "叶片",
+      "emptySlot": "空槽",
+      "select": "选择"
+    },
+    "canvas": {
+      "title": "二维装帧画布",
+      "subtitle": "龙鳞排布",
+      "straight": "直边",
+      "wave": "波浪",
+      "sawtooth": "锯齿",
+      "leafCount": "{{count}} 张叶片",
+      "assignedCount": "{{count}} 张已放入"
+    },
+    "settings": {
+      "title": "装帧设置",
+      "artworkHeight": "画心高度",
+      "pageWidth": "页面可视宽度",
+      "pasteWidth": "粘贴宽度",
+      "sliceWidth": "鳞片露出宽度",
+      "leafCount": "叶片数量",
+      "dpi": "导出精度",
+      "resetDefault": "恢复默认预设",
+      "cm": "厘米",
+      "sheet": "张",
+      "dpiUnit": "DPI"
+    },
+    "metrics": {
+      "leafPhysicalWidth": "叶片物理宽度",
+      "scrollArtworkLength": "长卷画心长度",
+      "pageStructureCount": "页面结构数",
+      "leafPixel": "单张叶片像素",
+      "scrollPixel": "长卷像素",
+      "centimeter": "厘米"
+    },
+    "export": {
+      "title": "导出项目",
+      "imagePackage": "图片包",
+      "imagePackageDesc": "包含 frame 图片、manifest 和 README",
+      "pdfPackage": "PDF 包",
+      "pdfPackageDesc": "包含打印页面 PDF 和校准页",
+      "readme": "README",
+      "readmeDesc": "中文组装说明",
+      "exporting": "导出中...",
+      "complete": "完成",
+      "cancel": "取消",
+      "confirm": "确认导出"
+    },
+    "preview": {
+      "flip": "翻页预览",
+      "scroll": "卷动预览",
+      "autoScroll": "自动",
+      "pause": "暂停",
+      "speed": "速度",
+      "prevPage": "上一页",
+      "nextPage": "下一页",
+      "hint": "使用 ← → 键翻页，ESC 退出"
+    },
+    "template": {
+      "title": "选择模板",
+      "useTemplate": "使用模板",
+      "leafCount": "{{count}} 叶",
+      "height": "{{count}}cm 高"
+    },
+    "recording": {
+      "start": "开始录制",
+      "pause": "暂停",
+      "resume": "继续",
+      "stop": "停止",
+      "recording": "录制中",
+      "paused": "已暂停",
+      "unsupported": "浏览器不支持录制功能"
+    },
+    "watermark": {
+      "enable": "启用水印",
+      "text": "水印文字",
+      "position": "位置",
+      "opacity": "透明度",
+      "bottomRight": "右下角",
+      "bottomLeft": "左下角",
+      "topRight": "右上角",
+      "topLeft": "左上角",
+      "center": "居中"
+    },
+    "crop": {
+      "title": "裁剪图片",
+      "zoom": "缩放",
+      "rotation": "旋转",
+      "confirm": "确认裁剪"
+    },
+    "validation": {
+      "ok": "素材和参数可用于测试导出",
+      "hintFront": "正面长卷尚未上传",
+      "hintBack": "背面长卷尚未上传",
+      "hintLeaves": "还缺 {{count}} 张内页素材"
+    },
+    "empty": {
+      "noDraft": "未发现本地草稿，已创建新项目。",
+      "waitingSave": "等待首次自动保存"
+    }
+  }
+}
