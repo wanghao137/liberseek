@@ -16,7 +16,8 @@
     "jspdf": "^4.2.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "react-easy-crop": "^6.0.2"
+    "react-easy-crop": "^6.0.2",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
