@@ -11,6 +11,10 @@ export type BindingSettings = {
   edgeStyle: EdgeStyle
   orientation: Orientation
   dpi: number
+  marginStartCm?: number
+  marginEndCm?: number
+  marginTopCm?: number
+  marginBottomCm?: number
 }
 
 export type RectCm = {
@@ -57,14 +61,22 @@ export function computeDerivedDimensions(
   const scrollArtworkLengthCm =
     settings.visiblePageWidthCm + settings.leafCount * settings.sliceWidthCm
 
+  const marginStart = settings.marginStartCm ?? 0
+  const marginEnd = settings.marginEndCm ?? 0
+  const marginTop = settings.marginTopCm ?? 0
+  const marginBottom = settings.marginBottomCm ?? 0
+
+  const totalScrollWidthCm = marginStart + scrollArtworkLengthCm + marginEnd
+  const totalScrollHeightCm = marginTop + settings.artworkHeightCm + marginBottom
+
   return {
     leafPhysicalWidthCm,
     scrollArtworkLengthCm,
     pageStructureCount: settings.leafCount + 1,
     frameWidthPx: cmToPx(leafPhysicalWidthCm, settings.dpi),
     frameHeightPx: cmToPx(settings.artworkHeightCm, settings.dpi),
-    scrollWidthPx: cmToPx(scrollArtworkLengthCm, settings.dpi),
-    scrollHeightPx: cmToPx(settings.artworkHeightCm, settings.dpi),
+    scrollWidthPx: cmToPx(totalScrollWidthCm, settings.dpi),
+    scrollHeightPx: cmToPx(totalScrollHeightCm, settings.dpi),
   }
 }
 
