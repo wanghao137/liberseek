@@ -32,6 +32,10 @@ import { TemplateSelector } from './components/TemplateSelector'
 import { WatermarkSettings } from './components/WatermarkSettings'
 import { ZoomIndicator } from './components/ZoomIndicator'
 import { QRCodeDisplay } from './components/QRCodeDisplay'
+import { ScrollCanvas } from './components/ScrollCanvas'
+import { FlipAnimation } from './components/FlipAnimation'
+import { StatusBar } from './components/StatusBar'
+import { EditableTitle } from './components/EditableTitle'
 import { useCanvasInteraction } from './hooks/useCanvasInteraction'
 import { DEFAULT_TRANSFORM, type TransformOptions } from './modules/editor/transformUtils'
 import { exportImagePackage, exportPdfPackage, exportReadme } from './modules/export/exportFlow'
@@ -111,6 +115,7 @@ function App() {
   const [watermarkOpacity, setWatermarkOpacity] = useState(0.6)
   const [isRecording, setIsRecording] = useState(false)
   const [recordingDuration, setRecordingDuration] = useState(0)
+  const [flipDirection, setFlipDirection] = useState<'left' | 'right' | null>(null)
   const recordingTimerRef = useRef<number | null>(null)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const recordedChunksRef = useRef<Blob[]>([])
@@ -230,7 +235,7 @@ function App() {
       <header className="topbar">
         <div className="brand-lockup">
           <span className="seal-mark">鳞</span>
-          <div><p className="eyebrow">LiberSeek 非遗装帧实验室</p><h1>鳞卷工坊</h1></div>
+          <div><p className="eyebrow">LiberSeek 非遗装帧实验室</p><EditableTitle value={project.title} onChange={(title) => setProject(c => ({ ...c, title }))} /></div>
         </div>
         <nav className="toolbar">
           <button onClick={() => void handleNewProject()}>新建</button>
@@ -288,11 +293,15 @@ function App() {
         <section className="canvas-panel">
           <div className="canvas-header"><div><p className="eyebrow">二维装帧画布</p><h2>龙鳞排布</h2></div><div className="canvas-meta"><span>{edgeStyleLabels[settings.edgeStyle]}</span><span>{settings.leafCount} 张叶片</span><span>{assignedLeafCount} 张已放入</span></div></div>
           <div className="scroll-stage" onWheel={canvasInteraction.handleWheel} onMouseDown={canvasInteraction.handleMouseDown} onMouseMove={canvasInteraction.handleMouseMove} onMouseUp={canvasInteraction.handleMouseUp} onDoubleClick={canvasInteraction.handleDoubleClick}>
-            <div className="scroll-base" style={{ width: `${previewWidth}px`, height: `${previewHeight}px`, transform: `scale(${canvasInteraction.viewState.scale}) translate(${canvasInteraction.viewState.offsetX}px, ${canvasInteraction.viewState.offsetY}px)` }}>
-              <canvas ref={canvasRef} width={Math.round(previewWidth)} height={Math.round(previewHeight)} style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none', opacity: 0 }} />
-              <div className="ruler horizontal-ruler" /><div className="ruler vertical-ruler" />
-              {leaves.map((leaf) => { const slot = project.leaves[leaf.index]; const asset = slot?.assetId ? assetMap.get(slot.assetId) : undefined; return (<div key={leaf.index} className={`leaf ${asset ? 'has-artwork' : ''}`} style={{ width: `${leaf.widthCm * previewScale}px`, height: `${leaf.heightCm * previewScale}px`, transform: `translateX(${leaf.xCm * previewScale}px)`, zIndex: leaf.index + 1 }}><div className="paste-zone" style={{ width: `${leaf.pasteRect.widthCm * previewScale}px` }} /><div className="visible-zone">{asset ? <img alt="" src={asset.previewUrl} /> : <span>{leaf.index + 1}</span>}</div></div>) })}
-            </div>
+            <ScrollCanvas width={previewWidth} height={previewHeight} scrollDecoration={true}>
+              <div className="scroll-base" style={{ width: '100%', height: '100%', transform: `scale(${canvasInteraction.viewState.scale}) translate(${canvasInteraction.viewState.offsetX}px, ${canvasInteraction.viewState.offsetY}px)` }}>
+                <canvas ref={canvasRef} width={Math.round(previewWidth)} height={Math.round(previewHeight)} style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none', opacity: 0 }} />
+                <div className="ruler horizontal-ruler" /><div className="ruler vertical-ruler" />
+                <FlipAnimation direction={flipDirection} onComplete={() => setFlipDirection(null)}>
+                  {leaves.map((leaf) => { const slot = project.leaves[leaf.index]; const asset = slot?.assetId ? assetMap.get(slot.assetId) : undefined; return (<div key={leaf.index} className={`leaf ${asset ? 'has-artwork' : ''}`} style={{ width: `${leaf.widthCm * previewScale}px`, height: `${leaf.heightCm * previewScale}px`, transform: `translateX(${leaf.xCm * previewScale}px)`, zIndex: leaf.index + 1 }}><div className="paste-zone" style={{ width: `${leaf.pasteRect.widthCm * previewScale}px` }} /><div className="visible-zone">{asset ? <img alt="" src={asset.previewUrl} /> : <span>{leaf.index + 1}</span>}</div></div>) })}
+                </FlipAnimation>
+              </div>
+            </ScrollCanvas>
             <ZoomIndicator scale={canvasInteraction.viewState.scale} onReset={canvasInteraction.reset} />
           </div>
           {/* Recording controls */}
@@ -305,6 +314,7 @@ function App() {
             )}
             {isRecording && <span style={{ color: '#ff4444', fontSize: 13, fontWeight: 600 }}><span style={{ display: 'inline-block', width: 8, height: 8, background: '#ff4444', borderRadius: '50%', marginRight: 6, animation: 'pulse 1s infinite' }} />录制中</span>}
           </div>
+          <StatusBar scrollWidthCm={derived.scrollArtworkLengthCm + 2} scrollHeightCm={settings.artworkHeightCm + 2} artworkWidthCm={settings.visiblePageWidthCm} artworkHeightCm={settings.artworkHeightCm} illustrationCount={assignedLeafCount} />
         </section>
 
         <aside className="side-panel inspector-panel">
